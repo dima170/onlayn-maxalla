@@ -7,49 +7,70 @@
 </head>
 <body>
     <h2 id="welcome">Загрузка...</h2>
-<div id="registration">
-  <h2>Регистрация</h2>
-  <input type="text" id="name" placeholder="Имя"><br><br>
-  <input type="tel" id="phone" placeholder="Телефон"><br><br>
-  <button onclick="sendData()">Зарегистрироваться</button>
-</div>
 
-<script>
-  function sendData() {
-    const name = document.getElementById("name").value;
-    const phone = document.getElementById("phone").value;
+    <div id="registration">
+        <h2>Регистрация</h2>
+        <input type="text" id="name" placeholder="Имя"><br><br>
+        <input type="tel" id="phone" placeholder="Телефон"><br><br>
+        <button onclick="sendData()">Зарегистрироваться</button>
+    </div>
 
-    const data = {
-      name: name,
-      phone: phone
-    };
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-    if (window.Telegram && Telegram.WebApp) {
-      Telegram.WebApp.sendData(JSON.stringify(data));
-      Telegram.WebApp.close(); // Закрывает WebApp после отправки
-    } else {
-      alert("Открой через Telegram, а не браузер.");
-    }
-  }
-</script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC2zTJ_GHo6wrsXqIjCW7zfFRxlNQKR6FE",
+            authDomain: "onlayn-mahalla.firebaseapp.com",
+            projectId: "onlayn-mahalla",
+            storageBucket: "onlayn-mahalla.appspot.com",
+            messagingSenderId: "246359143549",
+            appId: "1:246359143549:web:33c5f7db534e856dd46d14",
+            measurementId: "G-Q5RZHJ43PV"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.sendData = async function () {
+            const name = document.getElementById("name").value;
+            const phone = document.getElementById("phone").value;
+
+            if (!name || !phone) {
+                alert("Заполните все поля");
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, "users"), {
+                    name: name,
+                    phone: phone,
+                    telegram_id: window.Telegram.WebApp.initDataUnsafe?.user?.id || "неизвестен"
+                });
+
+                if (window.Telegram && Telegram.WebApp) {
+                    Telegram.WebApp.sendData(JSON.stringify({ name, phone }));
+                    Telegram.WebApp.close();
+                } else {
+                    alert("Открой через Telegram, а не браузер.");
+                }
+            } catch (e) {
+                console.error("Ошибка при сохранении:", e);
+                alert("Произошла ошибка. Попробуйте ещё раз.");
+            }
+        };
+    </script>
+
+    <!-- Telegram приветствие -->
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand();  // Разворачивает WebApp
+        tg.expand();
 
         const user = tg.initDataUnsafe.user;
-
         if (user) {
-            const name = user.first_name + " " + (user.last_name || "");
-            document.getElementById("welcome").innerText = "Ассалому алайкум, " + name + "!";
-
-            const userData = {
-                id: user.id,
-                name: name,
-                username: user.username
-            };
-
-            // пока без сервера, но можно отправить на backend:
-            console.log("Регистрация:", userData);
+            const fullName = ${user.first_name} ${user.last_name || ""}.trim();
+            document.getElementById("welcome").innerText = "Ассалому алайкум, " + fullName + "!";
         } else {
             document.getElementById("welcome").innerText = "Пожалуйста, откройте сайт через Telegram-бота.";
         }
