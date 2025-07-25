@@ -1,79 +1,33 @@
+
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <title>Onlayn Mahalla</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Onlayn Mahalla</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js"></script>
 </head>
 <body>
-    <h2 id="welcome">Загрузка...</h2>
-
-    <div id="registration">
-        <h2>Регистрация</h2>
-        <input type="text" id="name" placeholder="Имя"><br><br>
-        <input type="tel" id="phone" placeholder="Телефон"><br><br>
-        <button onclick="sendData()">Зарегистрироваться</button>
+  <div class="container">
+    <img src="assets/logo.jpg" alt="Onlayn Mahalla" class="logo" />
+    <h1>Onlayn Mahalla</h1>
+    <div id="register-form">
+      <input type="text" id="name" placeholder="Ismingiz" />
+      <input type="text" id="phone" placeholder="Telefon raqamingiz" />
+      <button onclick="register()">Ro‘yxatdan o‘tish</button>
     </div>
-
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyC2zTJ_GHo6wrsXqIjCW7zfFRxlNQKR6FE",
-            authDomain: "onlayn-mahalla.firebaseapp.com",
-            projectId: "onlayn-mahalla",
-            storageBucket: "onlayn-mahalla.appspot.com",
-            messagingSenderId: "246359143549",
-            appId: "1:246359143549:web:33c5f7db534e856dd46d14",
-            measurementId: "G-Q5RZHJ43PV"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        window.sendData = async function () {
-            const name = document.getElementById("name").value;
-            const phone = document.getElementById("phone").value;
-
-            if (!name || !phone) {
-                alert("Заполните все поля");
-                return;
-            }
-
-            try {
-                await addDoc(collection(db, "users"), {
-                    name: name,
-                    phone: phone,
-                    telegram_id: window.Telegram.WebApp.initDataUnsafe?.user?.id || "неизвестен"
-                });
-
-                if (window.Telegram && Telegram.WebApp) {
-                    Telegram.WebApp.sendData(JSON.stringify({ name, phone }));
-                    Telegram.WebApp.close();
-                } else {
-                    alert("Открой через Telegram, а не браузер.");
-                }
-            } catch (e) {
-                console.error("Ошибка при сохранении:", e);
-                alert("Произошла ошибка. Попробуйте ещё раз.");
-            }
-        };
-    </script>
-
-    <!-- Telegram приветствие -->
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-
-        const user = tg.initDataUnsafe.user;
-        if (user) {
-            const fullName = ${user.first_name} ${user.last_name || ""}.trim();
-            document.getElementById("welcome").innerText = "Ассалому алайкум, " + fullName + "!";
-        } else {
-            document.getElementById("welcome").innerText = "Пожалуйста, откройте сайт через Telegram-бота.";
-        }
-    </script>
+    <div id="menu" style="display:none;">
+      <h2>Mahalla Bozori</h2>
+      <ul>
+        <li>Mollar</li>
+        <li>Ekin</li>
+        <li>Meva</li>
+        <li>Uy anjom</li>
+      </ul>
+    </div>
+  </div>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
