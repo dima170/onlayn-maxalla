@@ -7,7 +7,31 @@
 </head>
 <body>
     <h2 id="welcome">Загрузка...</h2>
+<div id="registration">
+  <h2>Регистрация</h2>
+  <input type="text" id="name" placeholder="Имя"><br><br>
+  <input type="tel" id="phone" placeholder="Телефон"><br><br>
+  <button onclick="sendData()">Зарегистрироваться</button>
+</div>
 
+<script>
+  function sendData() {
+    const name = document.getElementById("name").value;
+    const phone = document.getElementById("phone").value;
+
+    const data = {
+      name: name,
+      phone: phone
+    };
+
+    if (window.Telegram && Telegram.WebApp) {
+      Telegram.WebApp.sendData(JSON.stringify(data));
+      Telegram.WebApp.close(); // Закрывает WebApp после отправки
+    } else {
+      alert("Открой через Telegram, а не браузер.");
+    }
+  }
+</script>
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();  // Разворачивает WebApp
